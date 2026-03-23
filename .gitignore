@@ -1,0 +1,17 @@
+# PyCharm
+.idea/
+cmake-build-*/
+*.iws
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+ENV/
+
+# Build
+build/
+dist/
+*.spec
