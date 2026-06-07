@@ -9,6 +9,11 @@ from tkinter import messagebox
 class KeyboardApp(ctk.CTk):
     def __init__(self):
         super().__init__()
+        icon_path = os.path.join(os.path.dirname(__file__), "icon.ico")
+        if os.path.exists(icon_path):
+            self.iconbitmap(icon_path)
+        else:
+            self.iconbitmap(default='shell32.dll,44')
         self.title("Laptop Keyboard Switcher v1.1")
         self.geometry("400x380")
         self.registry_path = r"SYSTEM\CurrentControlSet\Services\i8042prt"
@@ -91,8 +96,17 @@ class KeyboardApp(ctk.CTk):
                 text_color="#2ecc71" if state else "#e74c3c"
             )
             self.switch.configure(text="Enabled" if state else "Disabled")
+
+            if not state:
+                answer = messagebox.askyesno(
+                    "Требуется перезагрузка",
+                    "Чтобы отключить встроенную клавиатуру, необходимо перезагрузить компьютер.\n\n"
+                    "Перезагрузить сейчас?"
+                )
+                if answer:
+                    os.system("shutdown /r /t 1")
         except PermissionError:
-            messagebox.showerror("Error", "Run application as Administrator!")
+            messagebox.showerror("Ошибка", "Запустите приложение от имени администратора!")
             self.switch_var.set(not state)
 
     def get_keyboard_status(self):
