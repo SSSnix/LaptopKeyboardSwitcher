@@ -5,17 +5,28 @@ import sys
 import os
 from tkinter import messagebox
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 class KeyboardApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        icon_path = os.path.join(os.path.dirname(__file__), "icon.ico")
-        if os.path.exists(icon_path):
-            self.iconbitmap(icon_path)
-        else:
-            self.iconbitmap(default='shell32.dll,44')
+        icon_path = resource_path("icon.ico")
+        self.iconbitmap(icon_path)
         self.title("KB-Switcher")
-        self.geometry("400x380")
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        window_width = 400
+        window_height = 380
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2 - 50
+        self.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
         self.registry_path = r"SYSTEM\CurrentControlSet\Services\i8042prt"
 
         self.main_frame = ctk.CTkFrame(self, corner_radius=15)
