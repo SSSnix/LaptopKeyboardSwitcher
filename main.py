@@ -14,7 +14,7 @@ class KeyboardApp(ctk.CTk):
             self.iconbitmap(icon_path)
         else:
             self.iconbitmap(default='shell32.dll,44')
-        self.title("Laptop Keyboard Switcher v1.1")
+        self.title("KB-Switcher")
         self.geometry("400x380")
         self.registry_path = r"SYSTEM\CurrentControlSet\Services\i8042prt"
 
@@ -125,7 +125,7 @@ def is_admin():
         return False
 
 def set_app_id():
-    myappid = 'sssnix.keyboardswitcher.v1.1'
+    myappid = 'sssnix.KB-Switcher.v1.1'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 if __name__ == "__main__":
