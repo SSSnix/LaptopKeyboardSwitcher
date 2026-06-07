@@ -20,7 +20,7 @@
 1. Установите зависимости: `pip install customtkinter pyinstaller`
 2. Выполните команду:
    ```bash
-   pyinstaller --noconsole --onefile --uac-admin --icon="icon.ico" --name "KB-Switcher" main.py
+   pyinstaller --noconsole --onefile --uac-admin --icon="icon.ico" --add-data "icon.ico;." --name "KB-Switcher" main.py
 
 ## 🛠 Технологии
 - **Python 3.10+**
