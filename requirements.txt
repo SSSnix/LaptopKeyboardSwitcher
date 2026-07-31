@@ -1,0 +1,3 @@
+customtkinter>=5.2.0
+# wmi is no longer required (removed in v1.2)
+# pywin32 is a transitive dependency of customtkinter usually, but good to pin if needed

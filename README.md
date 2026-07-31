@@ -1,36 +1,26 @@
-# ⌨️ Laptop Keyboard Switcher
+# ⌨️ Laptop Keyboard Switcher (KB-Switcher)
 
-Простая утилита на Python для аппаратного отключения встроенной клавиатуры ноутбука через реестр Windows. Идеально подходит, если вы используете внешнюю клавиатуру, которую кладете прямо на корпус ноутбука.
+A simple Python utility to **hardware-disable** the built-in laptop keyboard via Windows Registry. Perfect if you use an external keyboard placed directly on the laptop chassis.
 
-## ✨ Особенности
-- **Permanent Disable**: Клавиатура остается выключенной даже после перезагрузки системы.
-- **Modern UI**: Темный интерфейс в стиле Windows 11 на базе `CustomTkinter`.
-- **Safe Operation**: Приложение не удаляет драйверы, а лишь меняет тип запуска службы `i8042prt`.
-- **UAC Ready**: Автоматический запрос прав администратора при запуске.
+## ✨ Features
+- **Permanent Disable**: Keyboard stays disabled across reboots.
+- **Modern UI**: Dark/Light mode support, Windows 11 style via `CustomTkinter`.
+- **Safe Operation**: Modifies the `i8042prt` (PS/2 Keyboard Port) service start type — no driver deletion.
+- **Smart Safety Check**: Detects active external HID keyboards (USB/Bluetooth) instantly via WinAPI (no WMI lag) and warns if none are found.
+- **UAC Aware**: Auto-requests Admin rights on launch.
+- **No Heavy Dependencies**: Removed `wmi`/`pywin32` bloat. Pure `ctypes` + `winreg`.
 
-## 🚀 Как использовать
-1. Скачайте или соберите `KB-Switcher.exe`.
-2. Запустите приложение (понадобятся права администратора).
-3. Переключите тумблер в состояние **Disabled**.
-4. **Перезагрузите ноутбук**, чтобы Windows перестала инициализировать встроенную клавиатуру.
+## 🚀 How to Use
+1. Download or build `KB-Switcher.exe`.
+2. Run the app (Admin rights required — prompted automatically).
+3. Toggle the switch to **Disabled**.
+4. **Reboot** the laptop (prompted by app) to stop Windows from initializing the built-in keyboard.
 
-## 🛠 Сборка из исходников
+## 🛠 Build from Source
 
-Если вы хотите собрать `.exe` самостоятельно:
-1. Установите зависимости: `pip install customtkinter pyinstaller`
-2. Выполните команду:
-   ```bash
-   pyinstaller --noconsole --onefile --uac-admin --icon="icon.ico" --name "KB-Switcher" main.py
+### Prerequisites
+- Python 3.10+
+- `pip install -r requirements.txt`
+- `pip install pyinstaller`
 
-## 🛠 Технологии
-- **Python 3.10+**
-- **CustomTkinter**: Современный графический интерфейс.
-- **Windows Registry API**: Взаимодействие с системными службами.
-- **PyInstaller**: Сборка в автономный `.exe`.
-
-## 🎨 Авторские права
-В приложении используется иконка:
-* <a target="_blank" href="https://icons8.com/icon/Roqno4dyy1MO/keyboard">Клавиатура</a> иконка от <a target="_blank" href="https://icons8.com">Icons8</a>
-
-## ⚠️ Дисклеймер
-Используйте приложение только при наличии внешней клавиатуры (USB или Bluetooth). Автор не несет ответственности за заблокированный ввод данных, если у вас нет резервного способа управления компьютером.
+### Build Command

@@ -1,21 +1,32 @@
-# PyCharm
-.idea/
-cmake-build-*/
-*.iws
-out/
-
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-venv/
-ENV/
 
-# Build
+# PyInstaller build artifacts
 build/
 dist/
 *.spec
 
-# Log
-*.log
-.aider*
+# Distribution / Packaging
+*.exe
+*.msi
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+icon.ico.bak
