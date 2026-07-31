@@ -124,27 +124,38 @@ class KeyboardService:
         """
         devices = []
         try:
-            # 1. Get count
+            # --- 1. Get Device Count ---
             n_devices = ctypes.c_uint(0)
-            ctypes.windll.user32.GetRawInputDeviceList(None, ctypes.byref(n_devices), ctypes.sizeof(ctypes.wintypes.HANDLE))
+            # FIX: cbSize must be sizeof(RAWINPUTDEVICELIST), not sizeof(HANDLE)
+            rid_size = ctypes.sizeof(ctypes.wintypes.RAWINPUTDEVICELIST)
+            
+            result = ctypes.windll.user32.GetRawInputDeviceList(
+                None, 
+                ctypes.byref(n_devices), 
+                rid_size
+            )
+            if result == -1: # Function failed
+                # print(f"GetRawInputDeviceList (count) failed: {ctypes.GetLastError()}", file=sys.stderr)
+                return []
             if n_devices.value == 0:
                 return []
 
-            # 2. Get list
+            # --- 2. Get Device List ---
             p_raw_input_device_list = (ctypes.wintypes.RAWINPUTDEVICELIST * n_devices.value)()
             got = ctypes.windll.user32.GetRawInputDeviceList(
                 ctypes.byref(p_raw_input_device_list),
                 ctypes.byref(n_devices),
-                ctypes.sizeof(ctypes.wintypes.RAWINPUTDEVICELIST)
+                rid_size
             )
             if got == -1:
+                # print(f"GetRawInputDeviceList (list) failed: {ctypes.GetLastError()}", file=sys.stderr)
                 return []
 
-            # 3. Iterate and filter Keyboards (Type == 1)
+            # --- 3. Iterate and Filter Keyboards (Type == 1) ---
             for i in range(n_devices.value):
                 rid = p_raw_input_device_list[i]
                 if rid.dwType == RIM_TYPEKEYBOARD:
-                    # Get Device Name length
+                    # Get Device Name length (in characters for W version)
                     size = ctypes.c_uint(0)
                     ctypes.windll.user32.GetRawInputDeviceInfoW(
                         rid.hDevice, RIDI_DEVICENAME, None, ctypes.byref(size)
@@ -152,22 +163,23 @@ class KeyboardService:
                     if size.value > 0:
                         # Get Device Name
                         buffer = ctypes.create_unicode_buffer(size.value)
-                        ctypes.windll.user32.GetRawInputDeviceInfoW(
+                        res = ctypes.windll.user32.GetRawInputDeviceInfoW(
                             rid.hDevice, RIDI_DEVICENAME, buffer, ctypes.byref(size)
                         )
-                        # Format: \\?\HID#VID_XXXX&PID_XXXX#...#{...}
-                        # Extract friendly part
-                        name = buffer.value
-                        # Clean up a bit for display
-                        if "#" in name:
-                            parts = name.split("#")
-                            # Usually VID/PID is in part 1 or 2
-                            dev_id = parts[1] if len(parts) > 1 else name
-                            devices.append(f"- HID Device ({dev_id})")
-                        else:
-                            devices.append(f"- {name}")
+                        if res != -1:
+                            name = buffer.value
+                            # Format: \\?\HID#VID_XXXX&PID_XXXX#...#{...}
+                            # Extract friendly part
+                            if "#" in name:
+                                parts = name.split("#")
+                                # Usually VID/PID is in part 1 or 2
+                                dev_id = parts[1] if len(parts) > 1 else name
+                                devices.append(f"- HID Device ({dev_id})")
+                            else:
+                                devices.append(f"- {name}")
 
-        except Exception:
+        except Exception as e:
+            # print(f"Raw Input Enum Error: {e}", file=sys.stderr)
             # Silently fail, return empty list (safe side: assume no external kb)
             pass
         return devices
@@ -175,9 +187,6 @@ class KeyboardService:
     @staticmethod
     def reboot_system():
         """Initiates immediate reboot using ExitWindowsEx."""
-        # Enable required privilege: SE_SHUTDOWN_NAME
-        # For simplicity in a small tool, we rely on the process token having it (Admin usually does).
-        # Proper way: AdjustTokenPrivileges. But ExitWindowsEx often works for Admin.
         ctypes.windll.user32.ExitWindowsEx(EWX_REBOOT | EWX_FORCEIFHUNG | EWX_HYBRID_SHUTDOWN, 0)
 
 
@@ -243,7 +252,6 @@ class KeyboardApp(ctk.CTk):
 
         # Progress Spinner (Hidden initially)
         self.spinner = ctk.CTkProgressBar(self.main_frame, mode="indeterminate", width=200)
-        # self.spinner.pack(pady=10) # Pack when needed
 
         # Hint
         self.hint = ctk.CTkLabel(
